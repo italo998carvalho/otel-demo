@@ -3,8 +3,6 @@ from typing import Union
 from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 from otel import start_span
-from opentelemetry.trace import Status, StatusCode
-from opentelemetry import trace
 
 app = FastAPI(port=8001)
 
@@ -23,8 +21,6 @@ def read_root():
 @app.get('/items')
 @start_span('list-items')
 def list_items():
-    current_span = trace.get_current_span()
-    current_span.set_status(Status(StatusCode.OK))
     return [x.model_dump() for x in item_list.values()]
 
 @app.get('/items/{item_id}')
