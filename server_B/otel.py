@@ -27,7 +27,8 @@ def start_span(name):
             tracer = trace.get_tracer(__name__)
             with tracer.start_as_current_span(name) as span:
                 result = func(*args, **kwargs)
-                span.set_status(Status(StatusCode.OK))
+                if span.status.status_code == StatusCode.UNSET:
+                    span.set_status(Status(StatusCode.OK))
                 return result
         return wrapper
     return decorator
