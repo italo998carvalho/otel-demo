@@ -16,7 +16,7 @@ class Item(BaseModel):
 
 @app.get('/')
 def read_root():
-    return {'Server': 'A'}
+    return {'Application': 'Client'}
 
 @app.get('/items')
 @start_span('list-items')

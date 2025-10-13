@@ -18,7 +18,7 @@ item_list = {}
 
 @app.get('/')
 def read_root():
-    return {'Server': 'B'}
+    return {'Application': 'Server'}
 
 @app.get('/items')
 @start_span('list-items')

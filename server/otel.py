@@ -9,7 +9,7 @@ from opentelemetry.sdk.trace.export import (
 from opentelemetry.trace import Status, StatusCode
 
 resource = Resource.create({
-    'service.name': 'server-B'
+    'service.name': 'application-server'
 })
 
 provider = TracerProvider(resource=resource)
@@ -18,7 +18,7 @@ provider.add_span_processor(processor)
 
 trace.set_tracer_provider(provider)
 
-tracer = trace.get_tracer('server.b')
+tracer = trace.get_tracer('application.server')
 
 def start_span(name):
     def decorator(func):
