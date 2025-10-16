@@ -2,7 +2,7 @@ import uvicorn
 from typing import Union
 from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
-from otel import start_span
+from otel import start_span, meter
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry import trace
 
@@ -16,8 +16,13 @@ class Item(BaseModel):
 
 item_list = {}
 
+counter = meter.create_counter(
+    "root.counter", unit="1", description="Counts the amount of get requests in the root"
+)
+
 @app.get('/')
 def read_root():
+    counter.add(1)
     return {'Application': 'Server'}
 
 @app.get('/items')
