@@ -4,6 +4,7 @@ from fastapi import FastAPI, Response
 from pydantic import BaseModel
 import requests
 from otel import start_span
+from opentelemetry.propagate import inject
 
 app = FastAPI()
 base_url = 'http://127.0.0.1:8001'
@@ -22,7 +23,7 @@ def read_root():
 @start_span('list-items')
 def list_items(response: Response):
     endpoint = base_url + '/items'
-    r = requests.get(endpoint)
+    r = requests.get(endpoint, headers=_injected_headers())
     
     response.status_code = r.status_code
     return r.json()
@@ -31,7 +32,7 @@ def list_items(response: Response):
 @start_span('read-item')
 def read_item(item_id: int, response: Response):
     endpoint = base_url + f'/items/{item_id}'
-    r = requests.get(endpoint)
+    r = requests.get(endpoint, headers=_injected_headers())
 
     response.status_code = r.status_code
     return r.json()
@@ -40,7 +41,11 @@ def read_item(item_id: int, response: Response):
 @start_span('update-item')
 def update_item(item_id: int, item: Item, response: Response):
     endpoint = base_url + f'/items/{item_id}'
-    r = requests.put(endpoint, json=_build_payload(item))
+    r = requests.put(
+        endpoint,
+        json=_build_payload(item),
+        headers=_injected_headers()
+    )
 
     response.status_code = r.status_code
     return r.json()
@@ -49,7 +54,11 @@ def update_item(item_id: int, item: Item, response: Response):
 @start_span('create-item')
 def create_item(item: Item, response: Response):
     endpoint = base_url + f'/items'
-    r = requests.post(endpoint, json=_build_payload(item))
+    r = requests.post(
+        endpoint,
+        json=_build_payload(item),
+        headers=_injected_headers()
+    )
 
     response.status_code = r.status_code
     return r.json()
@@ -58,7 +67,7 @@ def create_item(item: Item, response: Response):
 @start_span('remove-item')
 def remove_item(item_id: int, response: Response):
     endpoint = base_url + f'/items/{item_id}'
-    r = requests.delete(endpoint)
+    r = requests.delete(endpoint, headers=_injected_headers())
 
     response.status_code = r.status_code
     return r.json()
@@ -70,6 +79,12 @@ def _build_payload(item: Item) -> dict[str, any]:
         'price': item.price,
         'is_offer': item.is_offer
     }
+
+def _injected_headers():
+    headers = {'traceparent': None}
+    inject(headers)
+
+    return headers
 
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000)
