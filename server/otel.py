@@ -8,6 +8,7 @@ from opentelemetry.sdk.trace.export import (
     ConsoleSpanExporter,
 )
 from opentelemetry.trace import Status, StatusCode
+from opentelemetry.propagate import extract
 
 resource = Resource.create({
     'service.name': 'application-server'
@@ -15,6 +16,7 @@ resource = Resource.create({
 
 provider = TracerProvider(resource=resource)
 processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces"))
+# processor = BatchSpanProcessor(ConsoleSpanExporter())
 provider.add_span_processor(processor)
 
 trace.set_tracer_provider(provider)
@@ -26,7 +28,8 @@ def start_span(name):
         @wraps(func)
         def wrapper(*args, **kwargs):
             tracer = trace.get_tracer(__name__)
-            with tracer.start_as_current_span(name) as span:
+            ctx = _extract_context(kwargs)
+            with tracer.start_as_current_span(name, context=ctx) as span:
                 result = func(*args, **kwargs)
                 if span.status.status_code == StatusCode.UNSET:
                     span.set_status(Status(StatusCode.OK))
@@ -34,3 +37,9 @@ def start_span(name):
         return wrapper
     return decorator
 
+def _extract_context(wrapper_args):
+    request = wrapper_args.get('request', None)
+    if request is not None:
+        return extract(request.headers)
+    else:
+        return {}
