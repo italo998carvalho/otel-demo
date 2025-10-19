@@ -1,6 +1,6 @@
 import uvicorn
 from typing import Union
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Request, Response, status
 from pydantic import BaseModel
 from otel import start_span, meter
 from opentelemetry.trace import Status, StatusCode
@@ -27,12 +27,12 @@ def read_root():
 
 @app.get('/items')
 @start_span('list-items')
-def list_items():
+def list_items(request: Request):
     return [x.model_dump() for x in item_list.values()]
 
 @app.get('/items/{item_id}')
 @start_span('read-item')
-def read_item(item_id: int, response: Response):
+def read_item(item_id: int, request: Request, response: Response):
     if item_id in item_list:
         return item_list.get(item_id)
     else:
@@ -43,7 +43,7 @@ def read_item(item_id: int, response: Response):
 
 @app.put('/items/{item_id}')
 @start_span('update-item')
-def update_item(item_id: int, item: Item, response: Response):
+def update_item(item_id: int, item: Item, request: Request, response: Response):
     if item_id in item_list:
         item.item_id = item_id
         item_list[item_id] = item
@@ -56,13 +56,13 @@ def update_item(item_id: int, item: Item, response: Response):
 
 @app.post('/items', status_code=201)
 @start_span('create-item')
-def create_item(item: Item):
+def create_item(item: Item, request: Request):
     item_list[item.item_id] = item
     return {'status': 'created'}
 
 @app.delete('/items/{item_id}')
 @start_span('remove-item')
-def remove_item(item_id: int, response: Response):
+def remove_item(item_id: int, request: Request, response: Response):
     if item_id in item_list:
         item_list.pop(item_id)
         return {'status': 'deleted'}
