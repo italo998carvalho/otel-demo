@@ -1,6 +1,7 @@
 from functools import wraps
 from opentelemetry import trace, metrics
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import ConsoleMetricExporter, PeriodicExportingMetricReader
@@ -25,6 +26,7 @@ tracer = trace.get_tracer('application.server')
 
 # =================
 metric_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
+# metric_reader = PeriodicExportingMetricReader(OTLPMetricExporter(endpoint="http://localhost:4318/v1/traces"))
 provider = MeterProvider(metric_readers=[metric_reader])
 
 # Sets the global default meter provider
