@@ -1,11 +1,9 @@
 from functools import wraps
-from opentelemetry import trace, metrics
+from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace.export import (
-    BatchSpanProcessor,
-)
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry.propagate import extract
 
@@ -13,11 +11,11 @@ resource = Resource.create({
     'service.name': 'application-server'
 })
 
-tracer_provider = TracerProvider(resource=resource)
+provider = TracerProvider(resource=resource)
 processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces"))
-tracer_provider.add_span_processor(processor)
+provider.add_span_processor(processor)
 
-trace.set_tracer_provider(tracer_provider)
+trace.set_tracer_provider(provider)
 
 tracer = trace.get_tracer('application.server')
 
