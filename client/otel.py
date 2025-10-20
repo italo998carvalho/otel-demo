@@ -3,10 +3,7 @@ from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace.export import (
-    BatchSpanProcessor,
-    ConsoleSpanExporter,
-)
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry.propagate import extract
 
@@ -16,7 +13,6 @@ resource = Resource.create({
 
 provider = TracerProvider(resource=resource)
 processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces"))
-# processor = BatchSpanProcessor(ConsoleSpanExporter())
 provider.add_span_processor(processor)
 
 trace.set_tracer_provider(provider)

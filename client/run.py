@@ -5,6 +5,7 @@ from pydantic import BaseModel
 import requests
 from otel import start_span
 from opentelemetry.propagate import inject
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 app = FastAPI()
 base_url = 'http://127.0.0.1:8001'
@@ -87,4 +88,5 @@ def _injected_headers():
     return headers
 
 if __name__ == '__main__':
+    FastAPIInstrumentor.instrument_app(app)
     uvicorn.run(app, host='127.0.0.1', port=8000)
