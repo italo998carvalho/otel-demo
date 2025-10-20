@@ -43,7 +43,7 @@ service:
       exporters: [debug, spanmetrics]
 
     metrics/spanmetrics:
-      receivers: [spanmetrics]
+      receivers: [otlp, spanmetrics]
       exporters: [debug, prometheus]
 
   extensions: []

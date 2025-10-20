@@ -25,9 +25,11 @@ trace.set_tracer_provider(tracer_provider)
 tracer = trace.get_tracer('application.server')
 
 # =================
-metric_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
-# metric_reader = PeriodicExportingMetricReader(OTLPMetricExporter(endpoint="http://localhost:4318/v1/traces"))
-provider = MeterProvider(metric_readers=[metric_reader])
+# metric_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
+metric_reader = PeriodicExportingMetricReader(
+    OTLPMetricExporter(endpoint="http://localhost:4318/v1/metrics")
+)
+provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
 
 # Sets the global default meter provider
 metrics.set_meter_provider(provider)
