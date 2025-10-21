@@ -5,6 +5,14 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+  
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      memory:
+      disk:
+      network:
 
 processors:
   memory_limiter:
@@ -43,7 +51,7 @@ service:
       exporters: [debug, spanmetrics]
 
     metrics/spanmetrics:
-      receivers: [otlp, spanmetrics]
+      receivers: [otlp, spanmetrics, hostmetrics]
       exporters: [debug, prometheus]
 
   extensions: []
