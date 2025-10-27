@@ -36,6 +36,22 @@ services:
     restart: unless-stopped
     depends_on:
       - prometheus
+  
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo-data:/tmp/tempo
+      - ./tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "3200:3200" # Tempo HTTP
+      # OTLP endpoints exposed internally only (collector will send to tempo via service name)
+      - "9411:9411" # Zipkin
+      - "14268:14268" # Jaeger
+    networks:
+      - localprom
+    depends_on:
+      - prometheus
 
 networks:
   localprom:
