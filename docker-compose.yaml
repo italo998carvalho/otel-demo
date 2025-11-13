@@ -53,6 +53,18 @@ services:
     depends_on:
       - prometheus
 
+  pyroscope:
+    image: grafana/pyroscope:latest
+    ports:
+      # open port to access frontend
+      - "4040:4040"
+    networks:
+      - localprom
+    command:
+      # run pyroscope in server mode
+      - "server"
+    restart: unless-stopped
+
 networks:
   localprom:
     driver: bridge

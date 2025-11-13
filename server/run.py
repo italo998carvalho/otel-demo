@@ -6,6 +6,7 @@ from otel import start_span
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+import pyroscope
 
 app = FastAPI(port=8001)
 
@@ -24,7 +25,8 @@ def read_root():
 @app.get('/items')
 @start_span('list-items')
 def list_items(request: Request):
-    return [x.model_dump() for x in item_list.values()]
+    with pyroscope.tag_wrapper({ "controller": "list_items_controller" }):
+        return [x.model_dump() for x in item_list.values()]
 
 @app.get('/items/{item_id}')
 @start_span('read-item')
@@ -70,4 +72,8 @@ def remove_item(item_id: int, request: Request, response: Response):
     
 if __name__ == '__main__':
     FastAPIInstrumentor.instrument_app(app)
+    pyroscope.configure(
+        application_name = "application.server",
+        server_address   = "http://localhost:4040",
+    )
     uvicorn.run(app, host='127.0.0.1', port=8001)
