@@ -38,4 +38,4 @@ def _extract_context(wrapper_args):
     if request is not None:
         return extract(request.headers)
     else:
-        return {}
+        return None

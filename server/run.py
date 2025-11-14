@@ -6,6 +6,7 @@ from otel import start_span
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 app = FastAPI(port=8001)
 
@@ -70,4 +71,5 @@ def remove_item(item_id: int, request: Request, response: Response):
     
 if __name__ == '__main__':
     FastAPIInstrumentor.instrument_app(app)
+    RequestsInstrumentor().instrument()
     uvicorn.run(app, host='127.0.0.1', port=8001)
