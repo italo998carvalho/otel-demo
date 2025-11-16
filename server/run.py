@@ -7,6 +7,7 @@ from opentelemetry.trace import Status, StatusCode
 from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 import pyroscope
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 app = FastAPI(port=8001)
 
@@ -72,6 +73,7 @@ def remove_item(item_id: int, request: Request, response: Response):
     
 if __name__ == '__main__':
     FastAPIInstrumentor.instrument_app(app)
+    RequestsInstrumentor().instrument()
     pyroscope.configure(
         application_name = "application.server",
         server_address   = "http://localhost:4040",
