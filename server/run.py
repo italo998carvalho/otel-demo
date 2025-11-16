@@ -1,12 +1,12 @@
 import uvicorn
 from typing import Union
 from fastapi import FastAPI, Request, Response, status
+import pyroscope
 from pydantic import BaseModel
 from otel import start_span
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-import pyroscope
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 app = FastAPI(port=8001)
@@ -27,6 +27,11 @@ def read_root():
 @start_span('list-items')
 def list_items(request: Request):
     with pyroscope.tag_wrapper({ "controller": "list_items_controller" }):
+        tracer = trace.get_tracer(__name__)
+        with tracer.start_as_current_span("server-loop") as span:
+            tmp = []
+            for i in range(1000000):
+                tmp.append(i)
         return [x.model_dump() for x in item_list.values()]
 
 @app.get('/items/{item_id}')

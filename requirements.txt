@@ -2,6 +2,7 @@ annotated-types==0.7.0
 anyio==4.11.0
 asgiref==3.10.0
 certifi==2025.10.5
+cffi==2.0.0
 charset-normalizer==3.4.3
 click==8.3.0
 dnspython==2.8.0
@@ -26,15 +27,18 @@ opentelemetry-exporter-otlp-proto-http==1.38.0
 opentelemetry-instrumentation==0.59b0
 opentelemetry-instrumentation-asgi==0.59b0
 opentelemetry-instrumentation-fastapi==0.59b0
+opentelemetry-instrumentation-requests==0.59b0
 opentelemetry-proto==1.38.0
 opentelemetry-sdk==1.38.0
 opentelemetry-semantic-conventions==0.59b0
 opentelemetry-util-http==0.59b0
 packaging==25.0
 protobuf==6.32.1
+pycparser==2.23
 pydantic==2.12.0
 pydantic_core==2.41.1
 Pygments==2.19.2
+pyroscope-io==0.8.11
 python-dotenv==1.1.1
 python-multipart==0.0.20
 PyYAML==6.0.3

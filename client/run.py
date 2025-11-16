@@ -1,12 +1,15 @@
 import uvicorn
 from typing import Union
 from fastapi import FastAPI, Response
+import pyroscope
 from pydantic import BaseModel
 import requests
 from otel import start_span
 from opentelemetry.propagate import inject
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+
+from opentelemetry import trace
 
 app = FastAPI()
 base_url = 'http://127.0.0.1:8001'
@@ -26,6 +29,12 @@ def read_root():
 def list_items(response: Response):
     endpoint = base_url + '/items'
     r = requests.get(endpoint)
+
+    tracer = trace.get_tracer(__name__)
+    with tracer.start_as_current_span("client-loop") as span:
+        tmp = []
+        for i in range(1000000):
+            tmp.append(i)
     
     response.status_code = r.status_code
     return r.json()
@@ -83,4 +92,8 @@ def _build_payload(item: Item) -> dict[str, any]:
 if __name__ == '__main__':
     FastAPIInstrumentor.instrument_app(app)
     RequestsInstrumentor().instrument()
+    pyroscope.configure(
+        application_name = "application.server",
+        server_address   = "http://localhost:4040",
+    )
     uvicorn.run(app, host='127.0.0.1', port=8000)

@@ -5,6 +5,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.trace import Status, StatusCode
+from pyroscope.otel import PyroscopeSpanProcessor
 
 resource = Resource.create({
     'service.name': 'application-server'
@@ -13,6 +14,7 @@ resource = Resource.create({
 provider = TracerProvider(resource=resource)
 processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces"))
 provider.add_span_processor(processor)
+provider.add_span_processor(PyroscopeSpanProcessor())
 
 trace.set_tracer_provider(provider)
 
